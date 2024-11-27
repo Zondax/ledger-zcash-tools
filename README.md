@@ -1,9 +1,9 @@
 # Rust tools for Ledger Zcash app
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
-[![Github Actions](https://github.com/Zondax/ledger-zcash-rs/actions/workflows/main.yaml/badge.svg)](https://github.com/Zondax/ledger-zcash-rs)
+[![Github Actions](https://github.com/Zondax/ledger-zcash-tools/actions/workflows/main.yaml/badge.svg)](https://github.com/Zondax/ledger-zcash-tools)
 
-This package provides a basic Rust client library to communicate with the Crypto App running in a Ledger Nano S/X
+This package provides a basic Rust tooling to build and sign transactions using the Crypto App running in a Ledger Nano S/X
 devices
 
 ## Build
