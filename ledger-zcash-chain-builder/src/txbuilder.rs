@@ -53,6 +53,7 @@ use crate::{
     txprover::HsmTxProver,
 };
 
+use ledger_zcash_legacy_helpers::script_to_address;
 mod builder_data;
 pub use builder_data::*;
 
@@ -315,7 +316,7 @@ impl<P: consensus::Parameters, R: RngCore + CryptoRng, SA: sapling::Authorizatio
             return Err(Error::InvalidAmount);
         }
 
-        match coin.script_pubkey.address() {
+        match script_to_address(&coin.script_pubkey) {
             Some(TransparentAddress::PublicKey(hash)) => {
                 use ripemd::{Digest as _, Ripemd160};
                 use sha2::{Digest as _, Sha256};
@@ -509,7 +510,7 @@ impl<P: consensus::Parameters, R: RngCore + CryptoRng>
 
                 let nullifier = spend
                     .note
-                    .nf(&proof_generation_key.to_viewing_key(), spend.merkle_path.position);
+                    .nf(&proof_generation_key.to_viewing_key().nk, spend.merkle_path.position);
 
                 let (zkproof, cv, rk) = prover
                     .spend_proof(
@@ -960,6 +961,7 @@ impl<P: consensus::Parameters, R: RngCore + CryptoRng>
         Ok(v)
     }
 }
+
 // #[cfg(test)]
 // mod tests {
 // use ff::{Field, PrimeField};

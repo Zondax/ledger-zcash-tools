@@ -73,7 +73,7 @@ async fn get_key_ivk() {
 
     let resp = app.app.get_ivk(path).await.unwrap();
 
-    let ivk = hex::encode(resp.to_bytes());
+    let ivk = hex::encode(resp);
 
     assert_eq!(ivk, "6dfadf175921e6fbfa093c8f7c704a0bdb07328474f56c833dfcfa5301082d03");
 }
