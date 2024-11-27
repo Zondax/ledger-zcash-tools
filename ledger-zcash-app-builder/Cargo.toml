@@ -41,7 +41,7 @@ secp256k1 = { version = "0.29", default-features = false }
 zx-bip44 = "0.1.0"
 ledger-transport = "0.11"
 ledger-zondax-generic = "0.11"
-ledger-zcash = { git = "https://github.com/Zondax/ledger-zcash-rs", rev = "2b23c62be2c9d92df6826944c78a01fa8486691e" }
+ledger-zcash = { git = "https://github.com/Zondax/ledger-zcash-rs", tag = "v2.0.0" }
 ledger-zcash-chain-builder = { path = "../ledger-zcash-chain-builder" }
 
 
