@@ -41,6 +41,7 @@ use sapling_crypto::{
 use redjubjub::{Binding, Randomizer, Signature, SpendAuth, VerificationKey};
 use zcash_primitives::transaction::components::amount::NonNegativeAmount;
 use zcash_primitives::{
+    consensus::{self, BranchId},
     legacy::{Script, TransparentAddress},
     memo::MemoBytes as Memo,
     transaction::{
@@ -139,7 +140,7 @@ impl<P: consensus::Parameters, R: RngCore + CryptoRng> Builder<P, R, hsmauth::Un
             rng,
             params,
             height,
-            fee: DEFAULT_FEE,
+            fee: MINIMUM_FEE,
             anchor: None,
             spends: vec![],
             outputs: vec![],
@@ -836,7 +837,8 @@ where
                     log::error!("no binding signature");
                     Error::BindingSig
                 })?,
-        };
+                },
+            );
 
         let mut all_signatures_valid: bool = true;
 
@@ -857,7 +859,10 @@ where
                 let fr = spendinfo.alpha * SPENDING_KEY_GENERATOR;
 
                 let r: Randomizer = fr;
+
                 let ak = spendinfo.proofkey.ak;
+
+                let rk = VerificationKey::<SpendAuth>::from(ak).randomize(&r);
 
                 let message = {
                     let mut array = [0; 64];
@@ -908,7 +913,7 @@ where
 }
 
 impl<P: consensus::Parameters, R: RngCore + CryptoRng>
-Builder<P, R, MixedAuthorization<transparent::Authorized, sapling_crypto::bundle::Authorized>>
+    Builder<P, R, MixedAuthorization<transparent::Authorized, sapling_crypto::bundle::Authorized>>
 {
     /// Retrieve [`TransactionData`] parametrized with
     /// [`transaction::Authorized`]

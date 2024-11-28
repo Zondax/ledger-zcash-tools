@@ -20,6 +20,7 @@ use std::path::Path;
 use bellman::groth16::{Parameters, PreparedVerifyingKey, Proof};
 use bls12_381::Bls12;
 use ff::Field;
+use jubjub::Fq;
 use rand_core::OsRng;
 use redjubjub::{Binding, Signature, SpendAuth, VerificationKey};
 use sapling_crypto::{
@@ -179,9 +180,9 @@ pub trait HsmTxProver {
         ar: jubjub::Fr,
         value: u64,
         anchor: bls12_381::Scalar,
-        merkle_path: MerklePath<Node>,
+        merkle_path: MerklePath,
         rcv: jubjub::Fr,
-    ) -> Result<([u8; GROTH_PROOF_SIZE], jubjub::ExtendedPoint, PublicKey), Self::Error>;
+    ) -> Result<([u8; GROTH_PROOF_SIZE], jubjub::ExtendedPoint, redjubjub::VerificationKey<SpendAuth>), Self::Error>;
 
     /// Create the value commitment and proof for a Sapling
     /// [`OutputDescription`], while accumulating its value commitment
@@ -290,7 +291,7 @@ impl SpendProver for LocalTxProver {
         value: NoteValue,
         alpha: jubjub::Fr,
         rcv: ValueCommitTrapdoor,
-        anchor: bls12_381::Scalar,
+        anchor: Fq,
         merkle_path: MerklePath,
     ) -> Option<Spend> {
         SpendParameters::prepare_circuit(
