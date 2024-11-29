@@ -44,8 +44,8 @@ ledger-zondax-generic = "0.11"
 ledger-zcash = { git = "https://github.com/Zondax/ledger-zcash-rs", tag = "v2.0.0" }
 ledger-zcash-chain-builder = { path = "../ledger-zcash-chain-builder" }
 
-
-zcash_primitives = { git = "https://github.com/Zondax/librustzcash", rev = "ce278848fef35903db46c3dced41658e90bbeb3c", features = ["transparent-inputs"], optional = true, package = "zcash_primitives" }
+ledger-zcash-legacy-helpers = { path = "../ledger-zcash-legacy-helpers" }
+zcash_primitives = { version = "0.8", features = ["transparent-inputs"], optional = true }
 
 [dev-dependencies]
 futures = "0.3"

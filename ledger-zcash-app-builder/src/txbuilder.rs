@@ -41,6 +41,7 @@ use zx_bip44::BIP44Path;
 use crate::{
     DataInput, DataShieldedOutput, DataShieldedSpend, DataTransparentInput, DataTransparentOutput, ZcashAppBuilder,
 };
+use ledger_zcash_legacy_helpers::script_to_address;
 
 /// Ergonomic ZCash transaction builder for HSM
 #[derive(Default)]
@@ -67,8 +68,7 @@ impl TryFrom<DataInput> for Builder {
 
         for to in input.vec_tout.into_iter() {
             builder.add_transparent_output(
-                &to.script_pubkey
-                    .address()
+                &script_to_address(&to.script_pubkey)
                     .ok_or(BuilderError::InvalidAddress)?,
                 to.value,
             )?;
@@ -193,7 +193,7 @@ impl Builder {
             ripemd.finalize()
         };
 
-        match coin.script_pubkey.address() {
+        match script_to_address(&coin.script_pubkey) {
             Some(TransparentAddress::PublicKey(hash)) if hash == pkh[..] => {},
             _ => return Err(BuilderError::InvalidUTXOAddress),
         }
