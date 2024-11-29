@@ -226,6 +226,7 @@ impl<P: consensus::Parameters, R: RngCore + CryptoRng, TA: transparent::Authoriz
     Builder<P, R, MixedAuthorization<TA, hsmauth::sapling::Unauthorized>>
 {
     fn empty_sapling_bundle() -> Bundle<hsmauth::sapling::Unauthorized, NonNegativeAmount> {
+        Bundle::default();
         Bundle::from_parts(vec![], vec![], Amount::zero(),  Default::default())
     }
 

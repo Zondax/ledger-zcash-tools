@@ -24,7 +24,7 @@ use jubjub::Fq;
 use rand_core::OsRng;
 use redjubjub::{Binding, Signature, SpendAuth, VerificationKey};
 use sapling_crypto::{
-    bundle::GrothProofBytes, circuit::{Output, OutputParameters, Spend, SpendParameters}, prover::{OutputProver, SpendProver}, value::{NoteValue, ValueCommitTrapdoor}, Diversifier, MerklePath, PaymentAddress, ProofGenerationKey, Rseed
+    bundle::GrothProofBytes, circuit::{Output, OutputParameters, PreparedSpendVerifyingKey, Spend, SpendParameters}, prover::{OutputProver, SpendProver}, value::{NoteValue, ValueCommitTrapdoor}, Diversifier, MerklePath, PaymentAddress, ProofGenerationKey, Rseed
 };
 use zcash_primitives::transaction::components::{Amount, GROTH_PROOF_SIZE};
 use zcash_proofs::{default_params_folder, load_parameters, parse_parameters, ZcashParameters};
@@ -47,9 +47,9 @@ const SPROUT_HASH: &str = "e9b238411bd6c0ec4791e9d04245ec350c9c5744f5610dfcce436
 /// An implementation of [`HsmTxProver`] using Sapling Spend and Output
 /// parameters from locally-accessible paths.
 pub struct LocalTxProver {
-    spend_params: Parameters<Bls12>,
-    spend_vk: PreparedVerifyingKey<Bls12>,
-    output_params: Parameters<Bls12>,
+    spend_params: SpendParameters,
+    spend_vk: PreparedSpendVerifyingKey,
+    output_params: OutputParameters,
 }
 
 impl LocalTxProver {

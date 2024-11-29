@@ -42,7 +42,7 @@ impl<T: TAuthorization, S: SAuthorization> Authorization for MixedAuthorization<
 }
 
 pub mod sapling {
-    use sapling_crypto::bundle::Authorization;
+    use sapling_crypto::{builder::{Proven, Unsigned}, bundle::Authorization};
     use zcash_primitives::transaction::components::sapling;
 
     use crate::txbuilder::SpendDescriptionInfo;
@@ -59,8 +59,8 @@ pub mod sapling {
     pub struct Unauthorized {}
 
     impl sapling_crypto::bundle::Authorization for Unauthorized {
-        type SpendProof = <sapling_crypto::builder::InProgress<> as Authorization>::SpendProof;
-
+        type SpendProof = <sapling_crypto::builder::InProgress<Proven, Unsigned> as Authorization>::SpendProof;
+        type OutputProof = <sapling_crypto::builder::InProgress<Proven, Unsigned> as Authorization>::OutputProof;
         type AuthSig = SpendDescriptionInfo;
     }
 }

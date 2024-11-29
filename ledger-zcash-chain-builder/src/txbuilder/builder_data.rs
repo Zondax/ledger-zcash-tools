@@ -8,11 +8,12 @@ use chacha20poly1305::{
     ChaCha20Poly1305, Key, Nonce,
 };
 use group::{cofactor::CofactorGroup, GroupEncoding};
+use incrementalmerkletree::Position;
 use jubjub::SubgroupPoint;
 use rand::{CryptoRng, RngCore};
 use sha2::{Digest, Sha256};
 use sapling_crypto::{
-    bundle::{Authorization, GrothProofBytes}, keys::OutgoingViewingKey, note_encryption::{sapling_note_encryption, SaplingDomain, Zip212Enforcement}, Diversifier, MerklePath, Node, Note, PaymentAddress, ProofGenerationKey, Rseed
+    bundle::{Authorization, GrothProofBytes}, keys::OutgoingViewingKey, note_encryption::{sapling_note_encryption, SaplingDomain, Zip212Enforcement}, value::NoteValue, Diversifier, MerklePath, Node, Note, PaymentAddress, ProofGenerationKey, Rseed
 };
 use zcash_note_encryption::{Domain, NoteEncryption};
 use zcash_primitives::{
@@ -76,7 +77,7 @@ impl SaplingOutput {
 
         // let rseed = generate_random_rseed::<P, R>(height, rng);
 
-        let note = Note::from_parts(to, value, rseed);
+        let note = Note::from_parts(to, NoteValue::from_raw(i64::from(value) as u64), rseed);
 
         Ok(SaplingOutput { ovk, to, note, memo: memo.unwrap_or_else(Memo::empty), rcv, hashseed })
     }
@@ -90,10 +91,10 @@ impl SaplingOutput {
     ) -> transaction::components::OutputDescription<<hsmauth::sapling::Unauthorized as Authorization>::SpendProof>
     {
         let mut encryptor =
-        sapling_note_encryption::<R, P>(self.ovk, self.note.clone(), self.memo, rng);
+        sapling_note_encryption::<R>(self.ovk, self.note.clone(), *self.memo.as_array(), rng);
 
         let (zkproof, cv) = prover
-            .output_proof(ctx, *encryptor.esk(), self.to, self.note.rcm(), self.note.value(), self.rcv)
+            .output_proof(ctx, *encryptor.esk(), self.to, self.note.rcm(), self.note.value().inner(), self.rcv)
             .expect("output proof");
 
         let cmu = self.note.cmu();
@@ -253,8 +254,8 @@ impl SpendDescription {
             cv: info.cv().to_bytes(),
             anchor: info.anchor().to_bytes(),
             nullifier: info.nullifier().0,
-            rk: info.rk().try_into(),
-            zkproof: info.zkproof(),
+            rk: (*info.rk()).into(),
+            zkproof: *info.zkproof(),
         }
     }
 
@@ -292,10 +293,10 @@ From<&transaction::components::OutputDescription<<hsmauth::sapling::Unauthorized
         Self {
             cv: from.cv().to_bytes(),
             cmu: from.cmu().to_bytes(),
-            ephemeral_key: from.ephemeral_key().try_into(),
-            enc_ciphertext: from.enc_ciphertext(),
-            out_ciphertext: from.out_ciphertext(),
-            zkproof: from.zkproof(),
+            ephemeral_key: from.ephemeral_key().0,
+            enc_ciphertext: *from.enc_ciphertext(),
+            out_ciphertext: *from.out_ciphertext(),
+            zkproof: *from.zkproof(),
         }
     }
 }
@@ -342,9 +343,11 @@ pub fn output_data_hsm_fromtx(
 pub fn spend_old_data_fromtx(data: &[SpendDescriptionInfo]) -> Vec<NullifierInput> {
     let mut v = Vec::new();
     for info in data.iter() {
+        let p: u64 = info.merkle_path.position().into();
+       
         let n = NullifierInput {
             rcm_old: info.note.rcm().to_bytes(),
-            note_position: info.merkle_path.position().to_le_bytes(),
+            note_position: p.to_le_bytes()
         };
         v.push(n);
     }
