@@ -49,7 +49,7 @@ secp256k1 = { version = "0.21.2" }
 wagyu-zcash-parameters = { version = "0.2", optional = true }
 
 zcash_primitives = { git = "https://github.com/Zondax/librustzcash", rev = "ce278848fef35903db46c3dced41658e90bbeb3c", features = ["transparent-inputs"], package = "zcash_primitives" }
-zcash_proofs = { git = "https://github.com/Zondax/librustzcash", rev = "ce278848fef35903db46c3dced41658e90bbeb3c", features = ["multicore"], optional = true, package = "zcash_proofs" }
+zcash_proofs = { git = "https://github.com/Zondax/librustzcash", rev = "ce278848fef35903db46c3dced41658e90bbeb3c", default-features = false, features = ["local-prover"], optional = true, package = "zcash_proofs" }
 zcash_note_encryption = { git = "https://github.com/Zondax/librustzcash", rev = "ce278848fef35903db46c3dced41658e90bbeb3c", features = ["pre-zip-212"], package = "zcash_note_encryption" }
 
 thiserror = "1.0"
